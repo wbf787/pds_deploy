@@ -1,0 +1,35 @@
+name: Build LaTeX and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar o PDF com LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+
+      - name: Preparar diretório de publicação
+        run: |
+          mkdir public
+          # Move o PDF gerado pelo compilador
+          mv main.pdf public/
+          # Copia o seu index.html existente
+          cp index.html public/
+
+      - name: Deploy para o GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
